@@ -6,8 +6,8 @@ class Product(models.Model):
     product_name = models.CharField(max_length=25)
     CATEGORY_CHOICES = [('medicine','Medicine'),('cosmetic','Cosmetic')]
     category = models.CharField(max_length = 10,choices=CATEGORY_CHOICES)
-    quantity = models.IntegerField(validators=[MinValueValidator(10)])
-    threshold = models.IntegerField()
+    quantity = models.PositiveIntegerField()
+    threshold = models.PositiveIntegerField()
     expiry_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(default = "", null = False,db_index=True)
@@ -30,4 +30,14 @@ class Supplier(models.Model):
         super().save(*args, **kwargs)
     def __str__(self):
         return f"{self.supplier_name} {self.email} {self.phone_no}"
+    
+    
+class Sale(models.Model):
+    sold_at = models.DateTimeField(auto_now_add=True)
+    total_itmes = models.PositiveIntegerField()
+
+class SoldProduct(models.Model):
+    sale = models.ForeignKey("Sale", on_delete = models.CASCADE, related_name="sold_items")
+    product = models.ForeignKey("Product", on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
 
