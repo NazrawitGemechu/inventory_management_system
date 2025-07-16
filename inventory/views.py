@@ -15,8 +15,13 @@ def products(request):
     })
 def product_detail(request,slug):
     product = Product.objects.get(slug=slug)
+    if product.quantity < product.threshold or product.quantity == product.threshold:
+        above_threshold = product.quantity
+    else:
+        above_threshold=product.quantity - product.threshold
     return render(request,"inventory/product-detail.html",{
-        "product":product
+        "product":product,
+        "threshold": above_threshold
     })
 def suppliers(request):
     suppliers = Supplier.objects.all().order_by("supplier_name")

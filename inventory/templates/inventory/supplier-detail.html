@@ -1,30 +1,187 @@
 {% extends "inventory/base.html" %}
-{% block title %}{{ supplier.supplier_name }} - InventoryApp{% endblock %}
+
+{% block title %}{{ supplier.supplier_name }} - Supplier Details{% endblock %}
 
 {% block content %}
-<h1>{{ supplier.supplier_name }}</h1>
-<table class="table table-bordered w-50">
-  <tbody>
-    <tr>
-      <th>Email</th>
-      <td>{{ supplier.email }}</td>
-    </tr>
-    <tr>
-      <th>Phone</th>
-      <td>{{ supplier.phone_no }}</td>
-    </tr>
-    <tr>
-      <th>Products</th>
-      <td>
-        {% for product in supplier.products.all %}
-          <a href="{% url 'product-detail' product.slug %}">{{ product.product_name }}</a>{% if not forloop.last %}, {% endif %}
-        {% empty %}
-          None
-        {% endfor %}
-      </td>
-    </tr>
-  </tbody>
-</table>
+<div class="supplier-detail-container">
+    <div class="breadcrumb">
+        <a href="{% url 'inventory:index' %}">Dashboard</a>
+        <i class="fas fa-chevron-right"></i>
+        <a href="{% url 'inventory:suppliers' %}">Suppliers</a>
+        <i class="fas fa-chevron-right"></i>
+        <span>{{ supplier.supplier_name }}</span>
+    </div>
 
-<a href="{% url 'suppliers-page' %}" class="btn btn-secondary mt-3">Back to Suppliers</a>
+    <div class="supplier-detail-header">
+        <div class="supplier-title-section">
+            <div class="supplier-icon-large">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="supplier-title-info">
+                <h1 class="supplier-title">{{ supplier.supplier_name }}</h1>
+                <div class="supplier-badges">
+                    <span class="status-badge active">
+                        <i class="fas fa-check-circle"></i>
+                        Active Supplier
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="supplier-actions">
+            <a href="{% url 'inventory:suppliers' %}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i>
+                Back to Suppliers
+            </a>
+        </div>
+    </div>
+
+    <div class="supplier-detail-content">
+        <div class="detail-grid">
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-info-circle"></i>
+                        Supplier Information
+                    </h3>
+                </div>
+                <div class="card-content">
+                    <div class="detail-row">
+                        <span class="detail-label">Company Name:</span>
+                        <span class="detail-value">{{ supplier.supplier_name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email Address:</span>
+                        <span class="detail-value">
+                            <a href="mailto:{{ supplier.email }}" class="email-link">
+                                <i class="fas fa-envelope"></i>
+                                {{ supplier.email }}
+                            </a>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Phone Number:</span>
+                        <span class="detail-value">
+                            <a href="tel:{{ supplier.phone_no }}" class="phone-link">
+                                <i class="fas fa-phone"></i>
+                                {{ supplier.phone_no }}
+                            </a>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Supplier ID:</span>
+                        <span class="detail-value">{{ supplier.slug }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-chart-bar"></i>
+                        Statistics
+                    </h3>
+                </div>
+                <div class="card-content">
+                    <div class="stats-overview">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ supplier.product_set.count }}</div>
+                            <div class="stat-label">Total Products</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">
+                                {% for product in supplier.product_set.all %}
+                                    {% if product.category == 'medicine' %}{{ forloop.counter }}{% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="stat-label">Medicine Products</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">
+                                {% for product in supplier.product_set.all %}
+                                    {% if product.category == 'cosmetic' %}{{ forloop.counter }}{% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="stat-label">Cosmetic Products</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card full-width">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-capsules"></i>
+                        Supplied Products
+                    </h3>
+                </div>
+                <div class="card-content">
+                    {% if supplier.product_set.all %}
+                        <div class="products-table">
+                            <div class="table-header">
+                                <div class="table-cell">Product Name</div>
+                                <div class="table-cell">Category</div>
+                                <div class="table-cell">Stock</div>
+                                <div class="table-cell">Expiry Date</div>
+                                <div class="table-cell">Status</div>
+                                <div class="table-cell">Actions</div>
+                            </div>
+                            {% for product in supplier.product_set.all %}
+                            <div class="table-row">
+                                <div class="table-cell">
+                                    <div class="product-info">
+                                        <div class="product-icon">
+                                            {% if product.category == 'medicine' %}
+                                                <i class="fas fa-pills"></i>
+                                            {% else %}
+                                                <i class="fas fa-spray-can"></i>
+                                            {% endif %}
+                                        </div>
+                                        <span>{{ product.product_name }}</span>
+                                    </div>
+                                </div>
+                                <div class="table-cell">
+                                    <span class="category-badge {{ product.category|lower }}">
+                                        {{ product.category|title }}
+                                    </span>
+                                </div>
+                                <div class="table-cell">
+                                    <span class="stock-info">{{ product.quantity }} units</span>
+                                </div>
+                                <div class="table-cell">
+                                    <span>{{ product.expiry_date|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="table-cell">
+                                    <span class="stock-status {% if product.quantity <= product.threshold %}low-stock{% else %}in-stock{% endif %}">
+                                        {% if product.quantity <= product.threshold %}
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Low Stock
+                                        {% else %}
+                                            <i class="fas fa-check-circle"></i>
+                                            In Stock
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="table-cell">
+                                    <a href="{% url 'inventory:product_detail' product.slug %}" class="btn btn-sm btn-outline">
+                                        <i class="fas fa-eye"></i>
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-products">
+                            <i class="fas fa-box-open"></i>
+                            <h4>No products supplied</h4>
+                            <p>This supplier is not currently supplying any products.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+

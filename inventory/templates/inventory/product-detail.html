@@ -1,42 +1,196 @@
 {% extends "inventory/base.html" %}
-{% block title %}{{ product.product_name }} - InventoryApp{% endblock %}
+
+{% block title %}{{ product.product_name }} - Product Details{% endblock %}
 
 {% block content %}
-<h1>{{ product.product_name }}</h1>
-<table class="table table-bordered w-50">
-  <tbody>
-    <tr>
-      <th>Category</th>
-      <td>{{ product.get_category_display }}</td>
-    </tr>
-    <tr>
-      <th>Quantity</th>
-      <td>{{ product.quantity }}</td>
-    </tr>
-    <tr>
-      <th>Threshold</th>
-      <td>{{ product.threshold }}</td>
-    </tr>
-    <tr>
-      <th>Expiry Date</th>
-      <td>{{ product.expiry_date|date:"M d, Y" }}</td>
-    </tr>
-    <tr>
-      <th>Created At</th>
-      <td>{{ product.created_at|date:"M d, Y H:i" }}</td>
-    </tr>
-    <tr>
-      <th>Suppliers</th>
-      <td>
-        {% for supplier in product.supplier.all %}
-          <a href="{% url 'supplier-detail' supplier.slug %}">{{ supplier.supplier_name }}</a>{% if not forloop.last %}, {% endif %}
-        {% empty %}
-          None
-        {% endfor %}
-      </td>
-    </tr>
-  </tbody>
-</table>
+<div class="product-detail-container">
+    <div class="breadcrumb">
+        <a href="{% url 'inventory:index' %}">Dashboard</a>
+        <i class="fas fa-chevron-right"></i>
+        <a href="{% url 'inventory:products' %}">Products</a>
+        <i class="fas fa-chevron-right"></i>
+        <span>{{ product.product_name }}</span>
+    </div>
 
-<a href="{% url 'products-page' %}" class="btn btn-secondary mt-3">Back to Products</a>
+    <div class="product-detail-header">
+        <div class="product-title-section">
+            <div class="product-icon-large">
+                {% if product.category == 'medicine' %}
+                    <i class="fas fa-pills"></i>
+                {% else %}
+                    <i class="fas fa-spray-can"></i>
+                {% endif %}
+            </div>
+            <div class="product-title-info">
+                <h1 class="product-title">{{ product.product_name }}</h1>
+                <div class="product-badges">
+                    <span class="category-badge {{ product.category|lower }}">
+                        {{ product.category|title }}
+                    </span>
+                    <span class="stock-status {% if product.quantity <= product.threshold %}low-stock{% else %}in-stock{% endif %}">
+                        {% if product.quantity <= product.threshold %}
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Low Stock Alert
+                        {% else %}
+                            <i class="fas fa-check-circle"></i>
+                            In Stock
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="product-actions">
+            <a href="{% url 'inventory:products' %}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i>
+                Back to Products
+            </a>
+        </div>
+    </div>
+
+    <div class="product-detail-content">
+        <div class="detail-grid">
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-info-circle"></i>
+                        Product Information
+                    </h3>
+                </div>
+                <div class="card-content">
+                    <div class="detail-row">
+                        <span class="detail-label">Product Name:</span>
+                        <span class="detail-value">{{ product.product_name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Category:</span>
+                        <span class="detail-value">
+                            <span class="category-badge {{ product.category|lower }}">
+                                {{ product.category|title }}
+                            </span>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Product ID:</span>
+                        <span class="detail-value">{{ product.slug }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Date Added:</span>
+                        <span class="detail-value">{{ product.created_at|date:"F d, Y \a\t g:i A" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-warehouse"></i>
+                        Stock Information
+                    </h3>
+                </div>
+                <div class="card-content">
+                    <div class="stock-overview">
+                        <div class="stock-item">
+                            <div class="stock-number">{{ product.quantity }}</div>
+                            <div class="stock-label">Current Stock</div>
+                        </div>
+                        <div class="stock-item">
+                            <div class="stock-number">{{ product.threshold }}</div>
+                            <div class="stock-label">Minimum Threshold</div>
+                        </div>
+                        <div class="stock-item">
+                            <div class="stock-number">
+                               {{above_threshold}}
+                            </div>
+                            <div class="stock-label">Above Threshold</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stock-progress">
+                        <div class="progress-label">Stock Level</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {% widthratio product.quantity product.threshold|add:product.quantity 100 %}%"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span>{{ product.quantity }} units</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-calendar-alt"></i>
+                        Expiry Information
+                    </h3>
+                </div>
+                <div class="card-content">
+                    <div class="expiry-info">
+                        <div class="expiry-date">
+                            <i class="fas fa-calendar"></i>
+                            <span>{{ product.expiry_date|date:"F d, Y" }}</span>
+                        </div>
+                        <div class="expiry-status">
+                            {% now "Y-m-d" as today %}
+                            {% if product.expiry_date|date:"Y-m-d" < today %}
+                                <span class="status-badge expired">
+                                    <i class="fas fa-times-circle"></i>
+                                    Expired
+                                </span>
+                            {% elif product.expiry_date|timeuntil %}
+                                <span class="status-badge valid">
+                                    <i class="fas fa-check-circle"></i>
+                                    Valid
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="expiry-countdown">
+                        {% if product.expiry_date|date:"Y-m-d" >= today %}
+                            <p>Expires in: <strong>{{ product.expiry_date|timeuntil }}</strong></p>
+                        {% else %}
+                            <p>Expired: <strong>{{ product.expiry_date|timesince }} ago</strong></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-truck"></i>
+                        Suppliers
+                    </h3>
+                </div>
+                <div class="card-content">
+                    {% if product.supplier.all %}
+                        <div class="suppliers-list">
+                            {% for supplier in product.supplier.all %}
+                            <div class="supplier-item">
+                                <div class="supplier-info">
+                                    <h4>{{ supplier.supplier_name }}</h4>
+                                    <div class="supplier-contact">
+                                        <span><i class="fas fa-envelope"></i> {{ supplier.email }}</span>
+                                        <span><i class="fas fa-phone"></i> {{ supplier.phone_no }}</span>
+                                    </div>
+                                </div>
+                                <a href="{% url 'inventory:supplier_detail' supplier.slug %}" class="btn btn-sm btn-outline">
+                                    View Details
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-suppliers">
+                            <i class="fas fa-truck"></i>
+                            <p>No suppliers assigned to this product.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
