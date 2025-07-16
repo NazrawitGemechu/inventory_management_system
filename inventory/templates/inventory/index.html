@@ -1,0 +1,19 @@
+{% extends "inventory/base.html" %}
+{% block title %}Home - InventoryApp{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Latest Products</h1>
+
+<ul class="list-group mb-3">
+  {% for product in products %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <a href="{% url 'product-detail' product.slug %}">{{ product.product_name }}</a>
+      <span class="badge bg-primary rounded-pill">{{ product.quantity }}</span>
+    </li>
+  {% empty %}
+    <li class="list-group-item">No products available.</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'products-page' %}" class="btn btn-primary">View All Products</a>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "inventory/base.html" %}
+{% block title %}{{ supplier.supplier_name }} - InventoryApp{% endblock %}
+
+{% block content %}
+<h1>{{ supplier.supplier_name }}</h1>
+<table class="table table-bordered w-50">
+  <tbody>
+    <tr>
+      <th>Email</th>
+      <td>{{ supplier.email }}</td>
+    </tr>
+    <tr>
+      <th>Phone</th>
+      <td>{{ supplier.phone_no }}</td>
+    </tr>
+    <tr>
+      <th>Products</th>
+      <td>
+        {% for product in supplier.products.all %}
+          <a href="{% url 'product-detail' product.slug %}">{{ product.product_name }}</a>{% if not forloop.last %}, {% endif %}
+        {% empty %}
+          None
+        {% endfor %}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<a href="{% url 'suppliers-page' %}" class="btn btn-secondary mt-3">Back to Suppliers</a>
+{% endblock %}

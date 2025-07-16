@@ -1,0 +1,42 @@
+{% extends "inventory/base.html" %}
+{% block title %}{{ product.product_name }} - InventoryApp{% endblock %}
+
+{% block content %}
+<h1>{{ product.product_name }}</h1>
+<table class="table table-bordered w-50">
+  <tbody>
+    <tr>
+      <th>Category</th>
+      <td>{{ product.get_category_display }}</td>
+    </tr>
+    <tr>
+      <th>Quantity</th>
+      <td>{{ product.quantity }}</td>
+    </tr>
+    <tr>
+      <th>Threshold</th>
+      <td>{{ product.threshold }}</td>
+    </tr>
+    <tr>
+      <th>Expiry Date</th>
+      <td>{{ product.expiry_date|date:"M d, Y" }}</td>
+    </tr>
+    <tr>
+      <th>Created At</th>
+      <td>{{ product.created_at|date:"M d, Y H:i" }}</td>
+    </tr>
+    <tr>
+      <th>Suppliers</th>
+      <td>
+        {% for supplier in product.supplier.all %}
+          <a href="{% url 'supplier-detail' supplier.slug %}">{{ supplier.supplier_name }}</a>{% if not forloop.last %}, {% endif %}
+        {% empty %}
+          None
+        {% endfor %}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<a href="{% url 'products-page' %}" class="btn btn-secondary mt-3">Back to Products</a>
+{% endblock %}
