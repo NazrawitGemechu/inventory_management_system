@@ -35,23 +35,30 @@ class ProductForm(forms.ModelForm):
             }
         }
         
-   
-   
-   
-   
-    """
-    fields = ['product_name','category','supplier','quantity','threshold','expiry_date']
-     name = forms.CharField(label="Product Name:"max_length = 50)
-    CHOICES = [
-        ('medicne',"Medicne"),
-        ('cosmetic','Cosmetic')
-    ]
-    category = forms.ChoiceField(label = "Choose type of product"choices=[CHOICES])
+class SupplierForm(forms.ModelForm):
+    class Meta:
+        model = Supplier
+        exclude =['slug']
+        error_messages={
+            "supplier_name":{
+                "required": "Supplier name cannot be empty"
+            },
+            "phone_no":{
+                "required": "Phone number cannot be empty",
+                "max_length": "Phone number can not be more than 10 digit"
+            },
+            "email":{
+                "required": "Email address is required",
+                "invalid":"Invalid email format"
+            }
+        }
+        labels = {
+            "supplier_name": "Supplier Name",
+            "phone_no": "Phone number",
+            "email": "Email"
+        }
     
-    quantity = forms.IntegerField(label="Quantity")
-    threshold = forms.IntegerField(label="Minimum quntity")
-    exp = forms.DateField(label = "Expiry Date")
-    """
+    
    
     
     

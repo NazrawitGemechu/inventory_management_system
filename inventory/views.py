@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse,HttpResponseRedirect
 from .models import Product, Supplier, Sale, SoldProduct
-from .forms import ProductForm
+from .forms import ProductForm,SupplierForm
 from django.views import View
 # Create your views here.
 def index(request):
@@ -16,7 +16,7 @@ def products(request):
         "products":products
     })
     
-class AddProduuctView(View):
+class AddProductView(View):
     def get(self,request):
         form = ProductForm()
         return render(request,"inventory/add-product.html",{
@@ -26,7 +26,7 @@ class AddProduuctView(View):
         form = ProductForm(request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect("/products")
+            return HttpResponseRedirect("products")
         return render(request,"inventory/add-product.html",{
             "form":form
         })
@@ -41,6 +41,21 @@ def product_detail(request,slug):
         "product":product,
         "threshold": above_threshold
     })
+    
+class AddSupplierView(View):
+    def get(self, request):
+        form = SupplierForm()
+        return render(request, "inventory/add-supplier.html",{
+            "form": form
+        })
+    def post(self,request):
+        form = SupplierForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("suppliers")
+        return render(request,"inventory/add-supplier.html",{
+            "form":form
+        })
 def suppliers(request):
     suppliers = Supplier.objects.all().order_by("supplier_name")
     return render(request,"inventory/suppliers.html",{
