@@ -1,6 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
 from .models import Product, Supplier, Sale, SoldProduct
+from .forms import ProductForm
+from django.views import View
 # Create your views here.
 def index(request):
     products = Product.objects.all().order_by("product_name")[:10]
@@ -13,6 +15,22 @@ def products(request):
     return render(request, "inventory/products.html",{
         "products":products
     })
+    
+class AddProduuctView(View):
+    def get(self,request):
+        form = ProductForm()
+        return render(request,"inventory/add-product.html",{
+            "form":form
+        })
+    def post(self,request):
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("/products")
+        return render(request,"inventory/add-product.html",{
+            "form":form
+        })
+    
 def product_detail(request,slug):
     product = Product.objects.get(slug=slug)
     if product.quantity < product.threshold or product.quantity == product.threshold:
