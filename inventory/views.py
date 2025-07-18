@@ -3,7 +3,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from .models import Product, Supplier, Sale, SoldProduct
 from .forms import ProductForm,SupplierForm
 from django.views import View
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, UpdateView
 from django.views.generic.edit import CreateView
 # Create your views here.
 
@@ -21,6 +21,12 @@ class AddProductView(CreateView):
     form_class = ProductForm
     template_name = "inventory/add-product.html"
     success_url = "products"
+    
+class UpdateProductView(UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = "inventory/add-product.html"
+    success_url = "../products"
     
 def product_detail(request,slug):
     product = Product.objects.get(slug=slug)
@@ -50,7 +56,11 @@ class SupplierListView(ListView):
         base_query= super().get_queryset()
         data = base_query.order_by("supplier_name")
         return data
-    
+class UpdateSupplierView(UpdateView):
+    model = Supplier
+    form_class= SupplierForm
+    template_name = "inventory/add-supplier.html" 
+    success_url = "../suppliers"
 class SupplierDetailView(DetailView):
     template_name = "inventory/supplier-detail.html"
     model = Supplier
