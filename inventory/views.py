@@ -3,7 +3,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from .models import Product, Supplier, Sale, SoldProduct
 from .forms import ProductForm,SupplierForm
 from django.views import View
-from django.views.generic import ListView, DetailView, UpdateView
+from django.views.generic import ListView, DetailView, UpdateView,DeleteView
 from django.views.generic.edit import CreateView
 # Create your views here.
 
@@ -41,7 +41,11 @@ def product_detail(request,slug):
         "threshold": above_threshold,
         "stock":stock
     })
-    
+
+class DeleteProduct(DeleteView):
+    model = Product
+    template_name = "inventory/delete-product.html"
+    success_url ="../products"
 class AddSupplierView(CreateView):
     model = Supplier
     form_class = SupplierForm
@@ -64,3 +68,7 @@ class UpdateSupplierView(UpdateView):
 class SupplierDetailView(DetailView):
     template_name = "inventory/supplier-detail.html"
     model = Supplier
+class DeleteSupplier(DeleteView):
+    model = Supplier
+    template_name = "inventory/delete-supplier.html"
+    success_url = "../suppliers"
