@@ -4,7 +4,7 @@ from .models import Product, Supplier, Sale, SoldProduct
 from .forms import ProductForm,SupplierForm
 from django.views import View
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import CreateView
 # Create your views here.
 
 class ProductListView(ListView):
@@ -16,13 +16,11 @@ class ProductListView(ListView):
         data = base_query.order_by("product_name")
         return data
     
-class AddProductView(FormView):
+class AddProductView(CreateView):
+    model = Product
     form_class = ProductForm
     template_name = "inventory/add-product.html"
     success_url = "products"
-    def form_valid(self,form):
-        form.save()
-        return super().form_valid(form) 
     
 def product_detail(request,slug):
     product = Product.objects.get(slug=slug)
@@ -38,13 +36,11 @@ def product_detail(request,slug):
         "stock":stock
     })
     
-class AddSupplierView(FormView):
+class AddSupplierView(CreateView):
+    model = Supplier
     form_class = SupplierForm
     template_name = "inventory/add-supplier.html"
     success_url = "suppliers"
-    def form_valid(self,form):
-        form.save()
-        return super().form_valid(form)
     
 class SupplierListView(ListView):
     template_name = "inventory/suppliers.html"
