@@ -4,7 +4,9 @@ from .models import Product, Supplier, Sale, SoldProduct
 from .forms import ProductForm,SupplierForm
 from django.views import View
 from django.views.generic import ListView, DetailView
+from django.views.generic.edit import FormView
 # Create your views here.
+
 class ProductListView(ListView):
     template_name= "inventory/products.html"
     model = Product
@@ -13,20 +15,15 @@ class ProductListView(ListView):
         base_query = super().get_queryset()
         data = base_query.order_by("product_name")
         return data
-class AddProductView(View):
-    def get(self,request):
-        form = ProductForm()
-        return render(request,"inventory/add-product.html",{
-            "form":form
-        })
-    def post(self,request):
-        form = ProductForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect("products")
-        return render(request,"inventory/add-product.html",{
-            "form":form
-        })  
+    
+class AddProductView(FormView):
+    form_class = ProductForm
+    template_name = "inventory/add-product.html"
+    success_url = "products"
+    def form_valid(self,form):
+        form.save()
+        return super().form_valid(form) 
+    
 def product_detail(request,slug):
     product = Product.objects.get(slug=slug)
     if product.quantity < product.threshold or product.quantity == product.threshold:
@@ -40,20 +37,15 @@ def product_detail(request,slug):
         "threshold": above_threshold,
         "stock":stock
     })
-class AddSupplierView(View):
-    def get(self, request):
-        form = SupplierForm()
-        return render(request, "inventory/add-supplier.html",{
-            "form": form
-        })
-    def post(self,request):
-        form = SupplierForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect("suppliers")
-        return render(request,"inventory/add-supplier.html",{
-            "form":form
-        })
+    
+class AddSupplierView(FormView):
+    form_class = SupplierForm
+    template_name = "inventory/add-supplier.html"
+    success_url = "suppliers"
+    def form_valid(self,form):
+        form.save()
+        return super().form_valid(form)
+    
 class SupplierListView(ListView):
     template_name = "inventory/suppliers.html"
     model = Supplier
@@ -62,6 +54,7 @@ class SupplierListView(ListView):
         base_query= super().get_queryset()
         data = base_query.order_by("supplier_name")
         return data
+    
 class SupplierDetailView(DetailView):
     template_name = "inventory/supplier-detail.html"
     model = Supplier
