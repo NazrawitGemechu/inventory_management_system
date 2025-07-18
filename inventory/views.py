@@ -3,7 +3,7 @@ from django.http import HttpResponse,HttpResponseRedirect
 from .models import Product, Supplier, Sale, SoldProduct
 from .forms import ProductForm,SupplierForm
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 # Create your views here.
 class ProductListView(ListView):
     template_name= "inventory/products.html"
@@ -31,13 +31,15 @@ def product_detail(request,slug):
     product = Product.objects.get(slug=slug)
     if product.quantity < product.threshold or product.quantity == product.threshold:
         above_threshold = product.quantity
+        stock=False
     else:
         above_threshold=product.quantity - product.threshold
+        stock=True
     return render(request,"inventory/product-detail.html",{
         "product":product,
-        "threshold": above_threshold
+        "threshold": above_threshold,
+        "stock":stock
     })
-    
 class AddSupplierView(View):
     def get(self, request):
         form = SupplierForm()
@@ -60,8 +62,6 @@ class SupplierListView(ListView):
         base_query= super().get_queryset()
         data = base_query.order_by("supplier_name")
         return data
-def supplier_detail(request,slug):
-    supplier = Supplier.objects.get(slug=slug)
-    return render(request,"inventory/supplier-detail.html",{
-        "supplier":supplier
-    })
+class SupplierDetailView(DetailView):
+    template_name = "inventory/supplier-detail.html"
+    model = Supplier

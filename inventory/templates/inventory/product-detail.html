@@ -5,7 +5,7 @@
 {% block content %}
 <div class="product-detail-container">
     <div class="breadcrumb">
-        <a href="{% url 'inventory:index' %}">Dashboard</a>
+        <a href="">Dashboard</a>
         <i class="fas fa-chevron-right"></i>
         <a href="{% url 'inventory:products' %}">Products</a>
         <i class="fas fa-chevron-right"></i>
@@ -27,8 +27,8 @@
                     <span class="category-badge {{ product.category|lower }}">
                         {{ product.category|title }}
                     </span>
-                    <span class="stock-status {% if product.quantity <= product.threshold %}low-stock{% else %}in-stock{% endif %}">
-                        {% if product.quantity <= product.threshold %}
+                    <span class="stock-status {% if not sotck%}low-stock{% else %}in-stock{% endif %}">
+                        {% if not stock%}
                             <i class="fas fa-exclamation-triangle"></i>
                             Low Stock Alert
                         {% else %}
@@ -100,7 +100,7 @@
                         </div>
                         <div class="stock-item">
                             <div class="stock-number">
-                               {{above_threshold}}
+                               {{threshold}}
                             </div>
                             <div class="stock-label">Above Threshold</div>
                         </div>
