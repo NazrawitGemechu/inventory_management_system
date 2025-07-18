@@ -3,19 +3,16 @@ from django.http import HttpResponse,HttpResponseRedirect
 from .models import Product, Supplier, Sale, SoldProduct
 from .forms import ProductForm,SupplierForm
 from django.views import View
+from django.views.generic import ListView
 # Create your views here.
-def index(request):
-    products = Product.objects.all().order_by("product_name")[:10]
-    return render(request,"inventory/index.html",{
-        "products": products
-    })
-
-def products(request):
-    products = Product.objects.all().order_by("product_name")
-    return render(request, "inventory/products.html",{
-        "products":products
-    })
-    
+class ProductListView(ListView):
+    template_name= "inventory/products.html"
+    model = Product
+    context_object_name = "products"
+    def get_queryset(self):
+        base_query = super().get_queryset()
+        data = base_query.order_by("product_name")
+        return data
 class AddProductView(View):
     def get(self,request):
         form = ProductForm()
@@ -29,8 +26,7 @@ class AddProductView(View):
             return HttpResponseRedirect("products")
         return render(request,"inventory/add-product.html",{
             "form":form
-        })
-    
+        })  
 def product_detail(request,slug):
     product = Product.objects.get(slug=slug)
     if product.quantity < product.threshold or product.quantity == product.threshold:
@@ -56,11 +52,14 @@ class AddSupplierView(View):
         return render(request,"inventory/add-supplier.html",{
             "form":form
         })
-def suppliers(request):
-    suppliers = Supplier.objects.all().order_by("supplier_name")
-    return render(request,"inventory/suppliers.html",{
-        "suppliers":suppliers
-    })
+class SupplierListView(ListView):
+    template_name = "inventory/suppliers.html"
+    model = Supplier
+    context_object_name = "suppliers"
+    def get_queryset(self):
+        base_query= super().get_queryset()
+        data = base_query.order_by("supplier_name")
+        return data
 def supplier_detail(request,slug):
     supplier = Supplier.objects.get(slug=slug)
     return render(request,"inventory/supplier-detail.html",{
