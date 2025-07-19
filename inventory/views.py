@@ -5,6 +5,8 @@ from .forms import ProductForm,SupplierForm,SoldProductForm
 from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView,DeleteView
 from django.views.generic.edit import CreateView
+from dateutil.relativedelta import relativedelta
+from datetime import date
 # Create your views here.
 
 class ProductListView(ListView):
@@ -69,7 +71,20 @@ class SoldProductView(View):
         return render(request,"inventory/sell-product.html",{
             "form":form
         })
-        
+  
+def check_exp(request):
+    products = Product.objects.all()
+    product_list =[]
+    for product in products:
+        exp = product.expiry_date
+        today = date.today()
+        six_month_later = today + relativedelta(months=6)
+        if exp <= six_month_later:
+            product_list.append(product)
+    return render(request,"inventory/exp-warning.html",{
+        "products":product_list
+    })
+            
 class SellListView(ListView):
     model = SoldProduct
     template_name = "inventory/sells.html"

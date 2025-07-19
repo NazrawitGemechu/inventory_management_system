@@ -8,6 +8,7 @@ urlpatterns = [
     path("products/<slug>", views.product_detail, name="product_detail"),
     path("updateproduct/<slug>",views.UpdateProductView.as_view(),name="update-product"),
     path("deleteproduct/<slug>",views.DeleteProduct.as_view(),name="delete-product"),
+    path("exp",views.check_exp,name ="exp-warning"),
     path("addsupplier",views.AddSupplierView.as_view(),name="add-supplier"),
     path("suppliers", views.SupplierListView.as_view(), name="suppliers"),
     path("suppliers/<slug>",views.SupplierDetailView.as_view(), name="supplier_detail"),
