@@ -34,7 +34,9 @@ class Product(models.Model):
     
 class Sale(models.Model):
     sold_at = models.DateTimeField(auto_now_add=True)
-    total_itmes = models.PositiveIntegerField()
+    def __str__(self):
+        return f"{self.sold_at}"
+
 
 class SoldProduct(models.Model):
     sale = models.ForeignKey("Sale", on_delete = models.CASCADE, related_name="sold_items")

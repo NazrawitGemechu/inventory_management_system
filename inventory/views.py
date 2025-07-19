@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse,HttpResponseRedirect
 from .models import Product, Supplier, Sale, SoldProduct
-from .forms import ProductForm,SupplierForm
+from .forms import ProductForm,SupplierForm,SoldProductForm
 from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView,DeleteView
 from django.views.generic.edit import CreateView
@@ -46,6 +46,35 @@ class DeleteProduct(DeleteView):
     model = Product
     template_name = "inventory/delete-product.html"
     success_url ="../products"
+    
+class SoldProductView(View):
+    def get(self,request):
+        form = SoldProductForm()
+        return render(request, "inventory/sale-product.html",{
+            "form":form
+        })
+    def post(self,request):
+        form = SoldProductForm(request.POST)
+        if form.is_valid():
+            sale = Sale.objects.create()
+            sold_product =form.save(commit = False)
+            sold_product.sale =sale
+            sold_product.save()
+            product= sold_product.product
+            quantity = sold_product.quantity
+            new_quantity = product.quantity - quantity
+            product.quantity = new_quantity
+            product.save()
+            return HttpResponseRedirect("sells")
+        return render(request,"inventory/sell-product.html",{
+            "form":form
+        })
+        
+class SellListView(ListView):
+    model = SoldProduct
+    template_name = "inventory/sells.html"
+    context_object_name = "sells"
+   
 class AddSupplierView(CreateView):
     model = Supplier
     form_class = SupplierForm

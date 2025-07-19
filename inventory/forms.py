@@ -1,5 +1,5 @@
 from django import forms
-from .models import Supplier,Product
+from .models import Supplier,Product,SoldProduct
 class ProductForm(forms.ModelForm):
     supplier = forms.ModelMultipleChoiceField(queryset=Supplier.objects.all(), widget = forms.CheckboxSelectMultiple)
     class Meta:
@@ -58,7 +58,23 @@ class SupplierForm(forms.ModelForm):
             "email": "Email"
         }
     
-    
+class SoldProductForm(forms.ModelForm):
+    class Meta:
+        model = SoldProduct   
+        exclude=['sale']
+        labels ={
+            "product":"Select products sold",
+            "quantity":"Select amunt sold"
+        }
+        error_messages= {
+            "required":{
+                "product":"Select atleast one product",
+                "quantity":"Quantity cannot be empty"
+            },
+            "invalid":{
+                "quantity":"Quantity cannot be negative"
+            }
+        }
    
     
     
