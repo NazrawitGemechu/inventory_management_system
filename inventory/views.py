@@ -6,6 +6,7 @@ from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView,DeleteView
 from django.views.generic.edit import CreateView
 from dateutil.relativedelta import relativedelta
+from django.db.models import Sum
 from datetime import date
 # Create your views here.
 
@@ -90,6 +91,14 @@ class SellListView(ListView):
     template_name = "inventory/sells.html"
     context_object_name = "sells"
    
+class MostSelledView(ListView):
+    model = SoldProduct
+    template_name = "inventory/most-selled.html"
+    context_object_name = "products"
+    def get_queryset(self):
+        products = Product.objects.annotate(total_sold=Sum('soldproduct__quantity')).order_by('-total_sold')
+        return products
+    
 class AddSupplierView(CreateView):
     model = Supplier
     form_class = SupplierForm

@@ -42,4 +42,5 @@ class SoldProduct(models.Model):
     sale = models.ForeignKey("Sale", on_delete = models.CASCADE, related_name="sold_items")
     product = models.ForeignKey("Product", on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-
+    def __str__(self):
+        return f"{self.product}"
