@@ -98,7 +98,18 @@ class MostSelledView(ListView):
     def get_queryset(self):
         products = Product.objects.annotate(total_sold=Sum('soldproduct__quantity')).order_by('-total_sold')
         return products
-    
+def dashboard(request):
+    cos_products = Product.objects.filter(category='cosmetic')
+    cos_count =cos_products.count()
+    med_products = Product.objects.filter(category='medicine')
+    med_count=med_products.count()
+    suppliers = Supplier.objects.all()
+    sup_count = suppliers.count()
+    return render(request,"inventory/dashboard.html",{
+        "med_count":med_count,
+        "cos_count":cos_count,
+        "sup_count":sup_count
+    })
 class AddSupplierView(CreateView):
     model = Supplier
     form_class = SupplierForm
