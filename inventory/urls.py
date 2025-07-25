@@ -3,12 +3,10 @@ from . import views
 urlpatterns = [
     path("addproduct",views.AddProductView.as_view(),name = "add-product"),
     path("sellproduct",views.SoldProductView.as_view(),name="sell-product"),
-    path("sells",views.SellListView.as_view(),name="sold-products"),
     path("products", views.ProductListView.as_view(), name="products"),
     path("products/<slug>", views.product_detail, name="product_detail"),
     path("updateproduct/<slug>",views.UpdateProductView.as_view(),name="update-product"),
     path("deleteproduct/<slug>",views.DeleteProduct.as_view(),name="delete-product"),
-    path("exp",views.check_exp,name ="exp-warning"),
     path("mostselled",views.MostSelledView.as_view(), name = "most-selled"),
     path("dashboard",views.dashboard,name="dashboard"),
     path("addsupplier",views.AddSupplierView.as_view(),name="add-supplier"),

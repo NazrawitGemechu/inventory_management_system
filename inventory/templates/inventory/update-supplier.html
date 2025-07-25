@@ -1,0 +1,74 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %}Update Supplier - Pharmacy Inventory{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-edit"></i> Update Supplier
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Supplier Name -->
+                        <div class="form-group mb-3">
+                            <label for="id_supplier_name" class="form-label">
+                                <i class="fas fa-building text-primary"></i> Company Name
+                            </label>
+                            {{ form.supplier_name }}
+                            {% if form.supplier_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.supplier_name.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group mb-3">
+                            <label for="id_email" class="form-label">
+                                <i class="fas fa-envelope text-primary"></i> Email Address
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.email.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="form-group mb-3">
+                            <label for="id_phone_no" class="form-label">
+                                <i class="fas fa-phone text-primary"></i> Phone Number
+                            </label>
+                            {{ form.phone_no }}
+                            {% if form.phone_no.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.phone_no.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'inventory:supplier_detail' supplier.slug %}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Update Supplier
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

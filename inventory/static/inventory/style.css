@@ -75,6 +75,11 @@
     --transition-slow: 500ms ease-in-out;
 }
 
+/* CRITICAL: Sticky Footer Implementation for Bootstrap Structure */
+html {
+    height: 100%;
+}
+
 body {
     font-family: var(--font-family);
     font-size: var(--font-size-base);
@@ -82,15 +87,53 @@ body {
     color: var(--gray-800);
     background-color: var(--gray-50);
     min-height: 100vh;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Make the main container expand to fill available space */
+main.container {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Override Bootstrap's margin-top for main */
+main.container.mt-4 {
+    margin-top: 1.5rem !important;
+}
+
+/* Footer positioning - this is the key fix */
+footer.footer {
+    margin-top: auto !important;
+    flex-shrink: 0 !important;
+    background-color: var(--gray-800) !important;
+    color: var(--gray-300) !important;
+    padding: 1.5rem 0 !important;
+}
+
+/* Override Bootstrap's bg-light class */
+footer.footer.bg-light {
+    background-color: var(--gray-800) !important;
+}
+
+/* Override Bootstrap's py-3 class */
+footer.footer.py-3 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+
+/* Style the footer text */
+footer.footer p {
+    color: var(--gray-300) !important;
+    margin-bottom: 0 !important;
 }
 
 /* Navigation */
 .navbar {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
     box-shadow: var(--shadow-lg);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    flex-shrink: 0;
 }
 
 .nav-container {
@@ -855,60 +898,6 @@ body {
     font-size: var(--font-size-sm);
 }
 
-.supplier-stats {
-    margin-bottom: var(--spacing-4);
-}
-
-.stat-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-2) 0;
-}
-
-.stat-number {
-    font-weight: 600;
-    color: var(--primary-color);
-}
-
-.stat-label {
-    color: var(--gray-600);
-    font-size: var(--font-size-sm);
-}
-
-.supplier-actions {
-    display: flex;
-    gap: var(--spacing-3);
-}
-
-/* Supplier Detail */
-.suppliers-list {
-    margin-bottom: var(--spacing-6);
-}
-
-.supplier-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-4);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--spacing-3);
-    transition: var(--transition-fast);
-}
-
-.supplier-item:hover {
-    border-color: var(--primary-color);
-    background: var(--gray-50);
-}
-
-.supplier-contact {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-1);
-    margin-top: var(--spacing-2);
-}
-
 .email-link, .phone-link {
     color: var(--primary-color);
     text-decoration: none;
@@ -1041,21 +1030,6 @@ body {
     margin-bottom: var(--spacing-2);
 }
 
-/* Footer */
-.footer {
-    background: var(--gray-800);
-    color: var(--gray-300);
-    padding: var(--spacing-6) 0;
-    margin-top: var(--spacing-16);
-}
-
-.footer-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--spacing-4);
-    text-align: center;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .nav-menu {
@@ -1089,10 +1063,6 @@ body {
 
     .nav-toggle.active .bar:nth-child(3) {
         transform: translateY(-8px) rotate(-45deg);
-    }
-
-    .main-content {
-        padding: var(--spacing-4);
     }
 
     .page-title {
@@ -1174,10 +1144,6 @@ body {
 
 @media (max-width: 480px) {
     .nav-container {
-        padding: 0 var(--spacing-2);
-    }
-
-    .main-content {
         padding: var(--spacing-2);
     }
 
@@ -1244,3 +1210,61 @@ body {
 .visible {
     display: block;
 }
+
+/* Dashboard Styles */
+.dashboard-container {
+    padding: 2rem 0;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-subtitle {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    color: white;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+

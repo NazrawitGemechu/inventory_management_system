@@ -1,5 +1,21 @@
 from django import forms
 from .models import Supplier,Product,SoldProduct
+from django.contrib.auth.models import User
+"""
+class RegisterForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+    password_confirm = forms.CharField(widget=forms.PasswordInput,label="confirm password")
+    class Meta:
+        model = User
+        fields = ['username','password','password_confirm']
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data['password']
+        password_confirm = cleaned_data['password_confirm']
+        if password and password_confirm and password != password_confirm:
+            raise forms.ValidationError("Password do not match!")
+        return cleaned_data
+        """
 class ProductForm(forms.ModelForm):
     supplier = forms.ModelMultipleChoiceField(queryset=Supplier.objects.all(), widget = forms.CheckboxSelectMultiple)
     class Meta:

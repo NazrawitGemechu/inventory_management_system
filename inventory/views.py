@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse,HttpResponseRedirect
 from .models import Product, Supplier, Sale, SoldProduct
 from .forms import ProductForm,SupplierForm,SoldProductForm
@@ -8,9 +8,15 @@ from django.views.generic.edit import CreateView
 from dateutil.relativedelta import relativedelta
 from django.db.models import Sum
 from datetime import date
+from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 # Create your views here.
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
 
-class ProductListView(ListView):
+class ProductListView(LoginRequiredMixin,ListView):
     template_name= "inventory/products.html"
     model = Product
     context_object_name = "products"
@@ -19,18 +25,19 @@ class ProductListView(ListView):
         data = base_query.order_by("product_name")
         return data
     
-class AddProductView(CreateView):
+class AddProductView(LoginRequiredMixin,CreateView):
     model = Product
     form_class = ProductForm
     template_name = "inventory/add-product.html"
     success_url = "products"
     
-class UpdateProductView(UpdateView):
+class UpdateProductView(LoginRequiredMixin,UpdateView):
     model = Product
     form_class = ProductForm
-    template_name = "inventory/add-product.html"
+    template_name = "inventory/update-product.html"
     success_url = "../products"
     
+@login_required
 def product_detail(request,slug):
     product = Product.objects.get(slug=slug)
     if product.quantity < product.threshold or product.quantity == product.threshold:
@@ -45,15 +52,20 @@ def product_detail(request,slug):
         "stock":stock
     })
 
-class DeleteProduct(DeleteView):
+class DeleteProduct(LoginRequiredMixin,DeleteView):
     model = Product
     template_name = "inventory/delete-product.html"
     success_url ="../products"
+    def dispatch(self, request, *args, **kwargs):
+        if not is_admin(request.user):
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
     
-class SoldProductView(View):
+class SoldProductView(LoginRequiredMixin,View):
     def get(self,request):
         form = SoldProductForm()
-        return render(request, "inventory/sale-product.html",{
+        return render(request, "inventory/sell-product.html",{
             "form":form
         })
     def post(self,request):
@@ -68,30 +80,12 @@ class SoldProductView(View):
             new_quantity = product.quantity - quantity
             product.quantity = new_quantity
             product.save()
-            return HttpResponseRedirect("sells")
+            return HttpResponseRedirect("dashboard")
         return render(request,"inventory/sell-product.html",{
             "form":form
         })
-  
-def check_exp(request):
-    products = Product.objects.all()
-    product_list =[]
-    for product in products:
-        exp = product.expiry_date
-        today = date.today()
-        six_month_later = today + relativedelta(months=6)
-        if exp <= six_month_later:
-            product_list.append(product)
-    return render(request,"inventory/exp-warning.html",{
-        "products":product_list
-    })
-            
-class SellListView(ListView):
-    model = SoldProduct
-    template_name = "inventory/sells.html"
-    context_object_name = "sells"
    
-class MostSelledView(ListView):
+class MostSelledView(LoginRequiredMixin,ListView):
     model = SoldProduct
     template_name = "inventory/most-selled.html"
     context_object_name = "products"
@@ -105,18 +99,47 @@ def dashboard(request):
     med_count=med_products.count()
     suppliers = Supplier.objects.all()
     sup_count = suppliers.count()
+    products = Product.objects.all()
+    low_count = 0
+    product_count = 0
+    exp_count = 0
+    product_list =[]
+    for product in products:
+        product_count +=1
+        if product.quantity < product.threshold or product.quantity == product.threshold:
+            in_stock = False
+            low_count+=1
+        else:
+            in_stock = True
+    for product in products:
+
+        exp = product.expiry_date
+        today = date.today()
+        six_month_later = today + relativedelta(months=6)
+        if exp <= six_month_later:
+            product_list.append(product)
+            exp_count += 1
+    sold = SoldProduct.objects.order_by('-sale__sold_at')[:5]
+
+    
     return render(request,"inventory/dashboard.html",{
         "med_count":med_count,
         "cos_count":cos_count,
-        "sup_count":sup_count
+        "sup_count":sup_count,
+        "in_stock": in_stock,
+        "low_count": low_count,
+        "total":product_count,
+        "exp_count":exp_count,
+        "product_list":product_list,
+        "sold":sold
     })
-class AddSupplierView(CreateView):
+class AddSupplierView(LoginRequiredMixin,CreateView):
     model = Supplier
     form_class = SupplierForm
     template_name = "inventory/add-supplier.html"
     success_url = "suppliers"
     
-class SupplierListView(ListView):
+class SupplierListView(LoginRequiredMixin,ListView):
     template_name = "inventory/suppliers.html"
     model = Supplier
     context_object_name = "suppliers"
@@ -124,15 +147,19 @@ class SupplierListView(ListView):
         base_query= super().get_queryset()
         data = base_query.order_by("supplier_name")
         return data
-class UpdateSupplierView(UpdateView):
+class UpdateSupplierView(LoginRequiredMixin,UpdateView):
     model = Supplier
     form_class= SupplierForm
-    template_name = "inventory/add-supplier.html" 
+    template_name = "inventory/update-supplier.html" 
     success_url = "../suppliers"
-class SupplierDetailView(DetailView):
+class SupplierDetailView(LoginRequiredMixin,DetailView):
     template_name = "inventory/supplier-detail.html"
     model = Supplier
-class DeleteSupplier(DeleteView):
+class DeleteSupplier(LoginRequiredMixin,DeleteView):
     model = Supplier
     template_name = "inventory/delete-supplier.html"
     success_url = "../suppliers"
+    def dispatch(self, request, *args, **kwargs):
+        if not is_admin(request.user):
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
