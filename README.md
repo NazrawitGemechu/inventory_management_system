@@ -1,6 +1,6 @@
 # 🏥 Pharmaቤት Inventory Management System
 
-A comprehensive Django-based inventory management system designed specifically for pharmacies and medical supply stores. This system provides robust functionality for managing products, suppliers, sales tracking, and inventory monitoring with an intuitive web interface.
+A comprehensive Django-based inventory management system designed for pharmacies. This system provides robust functionality for managing products, suppliers, sales tracking, and inventory monitoring with an intuitive web interface.
 
 ![Dashboard Screenshot]("https://github.com/user-attachments/assets/330e6d96-ac10-4ff2-b2a5-c752594093d7")
 <img width="1355" height="643" alt="Dashboard_one" src="https://github.com/user-attachments/assets/330e6d96-ac10-4ff2-b2a5-c752594093d7" />
