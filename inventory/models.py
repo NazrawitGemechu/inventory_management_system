@@ -12,7 +12,7 @@ class Supplier(models.Model):
         self.slug = slugify(self.supplier_name)
         super().save(*args, **kwargs)
     def __str__(self):
-        return f"{self.supplier_name} {self.email} {self.phone_no}"
+        return f"{self.supplier_name}"
  
 class Product(models.Model):
     product_name = models.CharField(max_length=25)

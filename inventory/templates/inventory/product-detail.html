@@ -27,7 +27,7 @@
                     <span class="category-badge {{ product.category|lower }}">
                         {{ product.category|title }}
                     </span>
-                    <span class="stock-status {% if not sotck%}low-stock{% else %}in-stock{% endif %}">
+                    <span class="stock-status {% if not stock%}low-stock{% else %}in-stock{% endif %}">
                         {% if not stock%}
                             <i class="fas fa-exclamation-triangle"></i>
                             Low Stock Alert
